@@ -1,8 +1,8 @@
 import fs from 'fs';
 import readline from 'readline'
 
-runner_star_one('01', 7);
-runner_star_two('01', 5);
+runner_star_one(__filename.replace('.ts', ''), 7);
+runner_star_two(__filename.replace('.ts', ''), 5);
 
 function runner_star_one(day: string, testResult: number, run = 'test') {
   const lineReader = readline.createInterface({

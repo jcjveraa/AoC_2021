@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "debug TS file",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "ts-node",
+      // "runtimeArgs": ["--nolazy", "-r", "ts-node"],
+
+      "args": ["${file}"],
+      
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    }
+  ]
+}

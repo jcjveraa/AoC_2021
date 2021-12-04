@@ -28,11 +28,10 @@ export async function readLines(day: string, run: string): Promise<string[]> {
   return result;
 }
 
-export function reRunWithInput(result: number, expectedTestResult: number, runner: (a: number, b: string) => void): void {
+export function reRunWithInput(result: number, expectedTestResult: number, runner: (a: number, b: string) => void, star = '1'):void{
 
-  console.log(`Star 2 - test result: ${result}, expected was: ${expectedTestResult}`);
+  console.log(`Star ${star} - test result: ${result}, expected was: ${expectedTestResult}`);
   if (result === expectedTestResult) {
     runner(-1, 'input');
   }
-  return;
 }

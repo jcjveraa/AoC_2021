@@ -8,14 +8,14 @@ runner_star_one(4512, 'test');
 async function runner_star_one(expectedTestResult: number, run = 'test', day = __filename.replace('.ts', '')) {
   // INIT
   const lines = await readLines(day, run);
-  let result = 0;
+  let starOneResult = 0;
 
   // LINES
 
   const bingoValues = lines[0].split(',').map(v => +v);
 
   let currentBoard: Board = new Board();
-  const boards: Array<Board> = []
+  let boards: Array<Board> = []
 
   let counter = 0;
   for (let i = 1; i < lines.length; i++) {
@@ -30,23 +30,49 @@ async function runner_star_one(expectedTestResult: number, run = 'test', day = _
     counter++;
   }
 
+  let starTwoResult = -1;
+
   for (let i = 0; i < bingoValues.length; i++) {
-    result = boards.map(b => b.check(bingoValues[i])).reduce((a, c) => a + c, 0);
-    if(result > 0) {
-      break;
+    if(starOneResult === 0){
+      starOneResult = boards.map(b => b.check(bingoValues[i])).reduce((a, c) => a + c, 0);
+    } else {
+      boards.map(b => b.check(bingoValues[i]))
     }
+    const boards_copy: Array<Board> = boards.slice();
+
+    for (let j = 0; j < boards.length; j++) {
+      const board = boards[j];
+      if(board.hasWon){
+        boards_copy.splice(j, 1);
+        if(boards.length === 1) {
+          starTwoResult = board.unMarkedSum() * bingoValues[i];
+        }
+      }
+    }
+
+    boards = boards_copy.slice();
+
   }
 
   if (run === 'test') {
-    reRunWithInput(result, expectedTestResult, runner_star_one);
+    console.log(`Star 2 - test result: ${starTwoResult}`);
+    reRunWithInput(starOneResult, expectedTestResult, runner_star_one);
+    // reRunWithInput(starOneResult, expectedTestResult, runner_star_one);
   } else{
-    console.log(`Star 1 - input result: ${result}`);
+    console.log(`Star 1 - input result: ${starOneResult}`);
+    console.log(`Star 2 - input result: ${starTwoResult}`);
   }
 }
 
 class Board {
   private _rows: Array<BoardRowCol> = [];
   private _colums: Array<BoardRowCol> = [];
+
+  private _hasWon = false;
+  public get hasWon() {
+    return this._hasWon;
+  }
+
 
   /**
    *
@@ -76,12 +102,13 @@ class Board {
     const won_rows = this._rows.map(e => e.check(val)).some(e => e === true);
     const won_cols = this._colums.map(e => e.check(val)).some(e => e === true);
     if(won_rows || won_cols) {
+      this._hasWon = true;
       return this.unMarkedSum() * val;
     }
     return 0;
   }
 
-  private unMarkedSum(): number {
+  public unMarkedSum(): number {
     return this._rows.map(r => r.unMarkedSum()).reduce((acc, cur) => acc + cur, 0);
   }
 

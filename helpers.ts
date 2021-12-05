@@ -35,3 +35,20 @@ export function reRunWithInput(result: number, expectedTestResult: number, runne
     runner(-1, 'input');
   }
 }
+
+export function twoDArray(maxX: number, maxY: number, plusOne = true): number[][] {
+  if(plusOne){
+    maxX++;
+    maxY++;
+  }
+  const arr: number[][] = [];
+
+  for (let i = 0; i < maxX; i++) {
+    arr.push([]);
+    for (let j = 0; j < maxY; j++) {
+      arr[i].push(0);
+    }
+  }
+
+  return arr;
+}

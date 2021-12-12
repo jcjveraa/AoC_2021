@@ -1,7 +1,14 @@
 import {readLines, reRunWithInput} from './helpers';
 
-runner_star_one(37);
-runner_star_two(168);
+day7();
+
+async function day7() {
+  console.time('Star 7');
+  await runner_star_one(37);
+  await runner_star_two(168);
+  console.timeEnd('Star 7');
+}
+
 
 async function runner_star_one(expectedTestResult: number, run = 'test', day = __filename.replace('.ts', '')) {
   // INIT

@@ -126,7 +126,7 @@ async function runner_star_two(expectedTestResult: number, run = 'test', day = _
   if (run === 'test') {
     return reRunWithInput(result, expectedTestResult, runner_star_two, '2');
   }
-  console.log(`Star 1 - input result: ${result}`);
+  console.log(`Star 2 - input result: ${result}`);
 
 }
 

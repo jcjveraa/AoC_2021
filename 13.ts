@@ -118,7 +118,7 @@ async function runner_star_two(expectedTestResult: number, run = 'test', day = _
     let currString = '';
     for (let x = minx; x <= maxx; x++){
       if(xyDots.find(xy => xy.x === x && xy.y === y)) {
-        currString += '#';
+        currString += '█';
         continue
       }
       currString += ' ';

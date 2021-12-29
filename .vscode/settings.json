@@ -14,4 +14,5 @@
       "source.fixAll.eslint": true
     },
     "code-runner.saveFileBeforeRun": true,
+    "jest.autoRun": {"watch": false, "onSave": "test-src-file"}
 }

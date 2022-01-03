@@ -1,6 +1,51 @@
-import {readLines, reRunWithInput} from './helpers';
+import { readLines, reRunWithInput } from './helpers';
+import fs from 'fs';
+import os from 'os';
 
-runner_star_one(7);
+runner_star_one(40);
+mapExpander();
+mapExpander('input')
+
+async function mapExpander(run = 'test', day = __filename.replace('.ts', '')) {
+  const lines = await readLines(day, run);
+
+  const smallMap: number[][] = [];
+
+  lines.forEach((line) => {
+    const items = line.split('').map(n => +n);
+    smallMap.push([...items])
+  });
+
+  const maxX = smallMap[0].length;
+  const maxY = smallMap.length;
+
+  const fullMap: number[][] = [];
+  let resultString = '';
+
+  for (let y = 0; y < 5 * maxY; y++) {
+    fullMap.push([]);
+    for (let x = 0; x < 5 * maxX; x++) {
+      const baseX = x % maxX;
+      const baseY = y % maxY;
+      const increaser = Math.floor(x / maxX) + Math.floor(y / maxY);
+      let value = (smallMap[baseY][baseX] + increaser) % 10;
+      if (smallMap[baseY][baseX] + increaser >= 10) {
+        value++;
+      }
+      fullMap[y].push(value);
+    }
+
+    resultString += fullMap[y].join('') + '\n';
+  }
+
+
+  fs.unlinkSync('15_2.' + run);
+  fs.writeFileSync('15_2.' + run, resultString, { flag: 'w+' });
+
+  console.log('last result will be the star 2 result...')
+  runner_star_one(315, run, '15_2')
+
+}
 
 
 async function runner_star_one(expectedTestResult: number, run = 'test', day = __filename.replace('.ts', '')) {
@@ -26,19 +71,19 @@ async function runner_star_one(expectedTestResult: number, run = 'test', day = _
   });
   const maxY = allNodes.length / maxX;
   for (let x = 0; x < maxX; x++) {
-    for(let y = 0; y < maxY; y++) {
+    for (let y = 0; y < maxY; y++) {
       const thisNode = allNodes[x + maxX * y];
 
-      if(x > 0){
+      if (x > 0) {
         thisNode.neighbors.push(allNodes[(x - 1) + maxX * y])
       }
-      if(x < maxX - 1){
+      if (x < maxX - 1) {
         thisNode.neighbors.push(allNodes[(x + 1) + maxX * y])
       }
-      if(y < maxY - 1){
+      if (y < maxY - 1) {
         thisNode.neighbors.push(allNodes[x + maxX * (y + 1)])
       }
-      if(y > 0){
+      if (y > 0) {
         thisNode.neighbors.push(allNodes[x + maxX * (y - 1)])
       }
     }
@@ -49,7 +94,7 @@ async function runner_star_one(expectedTestResult: number, run = 'test', day = _
   const res = p.explore();
 
 
-  const result = 0;
+  const result = res.reduce((a, b) => a + b.costToTravelTo, -res[0].costToTravelTo);
 
   if (run === 'test') {
     return reRunWithInput(result, expectedTestResult, runner_star_one);
@@ -75,7 +120,7 @@ class Node {
 }
 
 //
-class PathFinder{
+class PathFinder {
   currentLowestCost = Number.MAX_SAFE_INTEGER;
   // startNode: Node;
   endNode: Node;
@@ -87,7 +132,7 @@ class PathFinder{
   gScore: Map<Node, number> = new Map();
   cameFrom: Map<Node, Node> = new Map();
 
-  constructor(startNode: Node, endNode: Node, gridWidth: number, allNodes: Node[]){
+  constructor(startNode: Node, endNode: Node, gridWidth: number, allNodes: Node[]) {
     this.openSet.add(startNode);
     this.endNode = endNode;
 
@@ -104,13 +149,12 @@ class PathFinder{
     this.setFScore(startNode);
   }
 
-  setFScore(node: Node){
+  setFScore(node: Node) {
     const gridDistance = this.endNode.x - node.x + this.endNode.y - node.y;
-    // 5 is the average of unexplored node travel cost
     const gScore = this.gScore.get(node);
-    if(gScore !== undefined) {
-      this.fScore.set(node, 5 * gridDistance + gScore)
-    } else{
+    if (gScore !== undefined) {
+      this.fScore.set(node, gridDistance + gScore)
+    } else {
       throw new Error('trying to get gscore but unset');
 
     }
@@ -118,7 +162,7 @@ class PathFinder{
   }
 
   explore(): Node[] {
-    while(this.openSet.size > 0){
+    while (this.openSet.size > 0) {
       let currentNode: Node = new Node(-1, -1, -1);
       let currentMinFscore = Number.MAX_SAFE_INTEGER;
       // this.fScore.forEach((value, key) =>{
@@ -130,19 +174,19 @@ class PathFinder{
 
       this.openSet.forEach(n => {
         const fScore = this.fScore.get(n);
-        if(fScore !== undefined){
-          if(fScore < currentMinFscore){
+        if (fScore !== undefined) {
+          if (fScore < currentMinFscore) {
             currentMinFscore = fScore;
             currentNode = n;
           }
         }
       })
 
-      if(!currentNode) {
+      if (!currentNode) {
         throw new Error('No currentnode');
       }
 
-      if(currentNode === this.endNode) {
+      if (currentNode === this.endNode) {
         return this.reconstruct_path(currentNode)
       }
 
@@ -150,21 +194,21 @@ class PathFinder{
 
       currentNode.neighbors.forEach(nb => {
         const gScore = this.gScore.get(currentNode);
-        if(gScore === undefined) {
+        if (gScore === undefined) {
           throw new Error('no gscore');
 
         }
         const tentative_gScore = gScore + nb.costToTravelTo;
         const neigborGscore = this.gScore.get(nb);
-        if(neigborGscore === undefined) {
+        if (neigborGscore === undefined) {
           throw new Error('no neighbor gscore');
 
         }
-        if(tentative_gScore < neigborGscore) {
+        if (tentative_gScore < neigborGscore) {
           this.cameFrom.set(nb, currentNode);
           this.gScore.set(nb, tentative_gScore);
           this.setFScore(nb);
-          if(!this.openSet.has(nb)) {
+          if (!this.openSet.has(nb)) {
             this.openSet.add(nb);
           }
         }
@@ -179,9 +223,9 @@ class PathFinder{
     path.push(node);
     let currNode = node;
 
-    while(this.cameFrom.get(currNode) !== undefined) {
+    while (this.cameFrom.get(currNode) !== undefined) {
       const cf = this.cameFrom.get(currNode);
-      if(cf){
+      if (cf) {
         currNode = cf;
         path.push(currNode);
       }

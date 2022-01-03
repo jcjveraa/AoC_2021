@@ -1,5 +1,4 @@
-import { _decodeSubsection, getPacketAndType, lengthType, readType4Value, decodeAny, parsePacket } from './16';
-
+import {decodeAny, getPacketAndType, lengthType, parsePacket, parseType4Packet, _decodeSubsection} from './16'
 test('Decode AB2 from 2nd place onwards = 1010 1011 0010 to 21', () => {
   expect(_decodeSubsection('AB2', 2, 5)).toBe(21);
   expect(_decodeSubsection('AB2', 4, 4)).toBe(11);
@@ -30,13 +29,13 @@ test('Packet and type - type 6', () => {
 })
 
 test('read type4 values', () => {
-  expect(readType4Value('D2FE28', 0).value).toBe(2021);
-  expect(readType4Value('D2FE28', 0).totalLength).toBe(6 + 15);
+  expect(parseType4Packet('D2FE28', 0).value).toBe(2021);
+  expect(parseType4Packet('D2FE28', 0).totalLength).toBe(6 + 15);
 })
 
 test('Fail on non type4 values', () => {
   expect(() => {
-    readType4Value('38006F45291200', 0)
+    parseType4Packet('38006F45291200', 0)
   }).toThrow();
 })
 
@@ -90,3 +89,22 @@ test('sum of packets packet parsing', () => {
   }
 
 })
+
+
+test('finds the sum of 1 and 2, resulting in the value 3.', () => {
+  let res = parsePacket('C200B40A82', 0);
+  expect(res).toBeTruthy();
+  if (res) {
+    expect(res.value).toBe(3);
+  }
+
+})
+
+test('produces 1, because 1 + 3 = 2 * 2', () => {
+  let res = parsePacket('9C0141080250320F1802104A08', 0);
+  expect(res).toBeTruthy();
+  if (res) {
+    expect(res.value).toBe(1);
+  }
+})
+
